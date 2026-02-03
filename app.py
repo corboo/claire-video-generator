@@ -59,12 +59,25 @@ def generate_audio(text: str) -> bytes:
     response.raise_for_status()
     return response.content
 
+def get_mime_type(filename: str) -> str:
+    """Get MIME type from filename"""
+    ext = filename.lower().split('.')[-1]
+    mime_types = {
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'mp3': 'audio/mpeg',
+        'wav': 'audio/wav'
+    }
+    return mime_types.get(ext, 'application/octet-stream')
+
 def upload_to_did(file_bytes: bytes, endpoint: str, field_name: str, filename: str) -> str:
     """Upload file to D-ID and return the S3 URL"""
+    mime_type = get_mime_type(filename)
     response = requests.post(
         f"https://api.d-id.com/{endpoint}",
         headers={"Authorization": f"Basic {DID_API_KEY}"},
-        files={field_name: (filename, file_bytes)}
+        files={field_name: (filename, file_bytes, mime_type)}
     )
     response.raise_for_status()
     return response.json()["url"]
