@@ -27,13 +27,13 @@ CLAIRE_VOICE_ID = "09eccfe9-8068-42c3-8f0a-e91f5d50d160"
 AVATAR_PATH = Path(__file__).parent / "assets" / "chef-avatar.png"
 
 st.set_page_config(
-    page_title="Claire Delish",
-    page_icon="🍳",
+    page_title="AI Video Generator",
+    page_icon="🎬",
     layout="centered"
 )
 
-st.title("🍳 Claire Delish")
-st.markdown("*Your AI cooking companion*")
+st.title("🎬 AI Video Generator")
+st.markdown("*Create talking avatar videos with any face*")
 
 # Check API keys
 if not HUME_API_KEY or not DID_API_KEY:
@@ -109,30 +109,59 @@ def create_video(image_url: str, audio_url: str) -> str:
 # Main UI
 st.markdown("---")
 
+# Image upload option
+st.subheader("👤 Choose Your Avatar")
+
+avatar_option = st.radio(
+    "Select avatar source:",
+    ["Use default (Claire)", "Upload your own image"],
+    horizontal=True
+)
+
+uploaded_image = None
+if avatar_option == "Upload your own image":
+    uploaded_image = st.file_uploader(
+        "Upload a face image (JPG or PNG)",
+        type=["jpg", "jpeg", "png"],
+        help="For best results, use a clear, front-facing photo with good lighting"
+    )
+    if uploaded_image:
+        st.image(uploaded_image, caption="Your avatar", width=200)
+
+st.markdown("---")
+
 # Text input
+st.subheader("💬 Script")
 script = st.text_area(
-    "What should Claire say?",
+    "What should they say?",
     placeholder="Hi everyone! Today we're making the most delicious pasta you've ever tasted...",
     height=150
 )
 
+# Determine if we can generate
+can_generate = script and (avatar_option == "Use default (Claire)" or uploaded_image is not None)
+
 # Generate button
-if st.button("🎬 Generate Video", type="primary", disabled=not script):
+if st.button("🎬 Generate Video", type="primary", disabled=not can_generate):
     if len(script) > 1000:
         st.error("Script too long! Keep it under 1000 characters.")
     else:
         with st.status("Creating your video...", expanded=True) as status:
             try:
                 # Step 1: Generate audio
-                st.write("🎙️ Generating Claire's voice...")
+                st.write("🎙️ Generating voice...")
                 audio_bytes = generate_audio(script)
                 st.write("✅ Audio generated!")
                 
-                # Step 2: Upload image
+                # Step 2: Upload image (custom or default)
                 st.write("📤 Uploading avatar...")
-                with open(AVATAR_PATH, "rb") as f:
-                    image_bytes = f.read()
-                image_url = upload_to_did(image_bytes, "images", "image", "avatar.png")
+                if uploaded_image is not None:
+                    image_bytes = uploaded_image.getvalue()
+                    image_url = upload_to_did(image_bytes, "images", "image", uploaded_image.name)
+                else:
+                    with open(AVATAR_PATH, "rb") as f:
+                        image_bytes = f.read()
+                    image_url = upload_to_did(image_bytes, "images", "image", "avatar.png")
                 st.write("✅ Avatar uploaded!")
                 
                 # Step 3: Upload audio
@@ -157,7 +186,7 @@ if st.button("🎬 Generate Video", type="primary", disabled=not script):
                 st.download_button(
                     label="⬇️ Download Video",
                     data=video_bytes,
-                    file_name="claire-delish.mp4",
+                    file_name="talking-avatar.mp4",
                     mime="video/mp4"
                 )
                 
