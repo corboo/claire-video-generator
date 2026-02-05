@@ -1,8 +1,10 @@
 [theme]
-primaryColor = "#FF6B35"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#FFF5F0"
-textColor = "#333333"
+# IPAI Brand Colors - Silver to Gold
+primaryColor = "#d4af37"
+backgroundColor = "#2d2d2d"
+secondaryBackgroundColor = "#3a3a3a"
+textColor = "#ffffff"
+font = "sans serif"
 
 [server]
-headless = true
+maxUploadSize = 200

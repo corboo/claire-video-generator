@@ -32,8 +32,34 @@ st.set_page_config(
     layout="centered"
 )
 
-st.title("🎬 AI Video Generator")
-st.markdown("*Create talking avatar videos with any face*")
+# IPAI Branding CSS
+st.markdown("""
+<style>
+    .stApp { background-color: #2d2d2d; }
+    h1 {
+        background: linear-gradient(180deg, #c5c5c5 0%, #d4af37 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .stButton>button {
+        background: linear-gradient(135deg, #d4af37 0%, #e8c547 100%);
+        color: #2d2d2d;
+        border: none;
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Header with logo
+col1, col2 = st.columns([1, 5])
+with col1:
+    try:
+        st.image("ipai-logo.jpg", width=50)
+    except:
+        pass
+with col2:
+    st.title("🎬 AI Video Generator")
+    st.markdown("*Create talking avatar videos with any face*")
 
 # Check API keys
 if not HUME_API_KEY or not DID_API_KEY:
